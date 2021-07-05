@@ -1,3 +1,4 @@
+from gxipy.gxiapi import Timeout
 from camera import GxCamera
 from utils import unpack_results
 from typing import Mapping
@@ -52,27 +53,30 @@ info_dict = {"cam_sn": "NE0200060045", "expose": 35000, "gain": 8.0,
 
 device_manager = gx.DeviceManager()
 
-# class camera_thread(threading.Thread):
-#     def __init__(self,camera_info_dict,device_manager):
-#         threading.Thread.__init__(self)
-#         self.cam=GxCamera(info_dict=camera_info_dict, device_manager=device_manager)
-#         self.img_queue = queue.Queue()
+class camera_thread(threading.Thread):
+    def __init__(self,camera_info_dict,device_manager):
+        threading.Thread.__init__(self)
+        self.cam=GxCamera(info_dict=camera_info_dict, device_manager=device_manager)
+        self.cam.cam_start()
+        self.img_queue = queue.Queue()
 
-#     def run(self):
-#         while True:
-#             img=self.cam.read_image()
-#             self.img_queue.put(img)
+    def run(self):
+        while True:
+            img=self.cam.read_image()
+            self.img_queue.put(img)
             
-#     def get_image(self):
-#         return self.result_queue.get()
-
+    def get_image(self):
+        return self.img_queue.get(timeout=1)
+        
 # dev_num, dev_info_list = device_manager.update_device_list() 
 def test_video(video_path):
     if video_path == "cam":
         cap = cv2.VideoCapture(0)
     elif video_path == "daheng":
-        cap = GxCamera(info_dict,device_manager)
-        cap.cam_start()
+        camera_t=camera_thread(info_dict,device_manager)
+        camera_t.start()
+        # cap = GxCamera(info_dict,device_manager)
+        # cap.cam_start()
     else:
         cap = cv2.VideoCapture(video_path)
     size = None
@@ -80,10 +84,17 @@ def test_video(video_path):
     fps = 25
 
     best_target = None
+    count=0
+    start_all =time.time()
     while True:
+        if count <2000:
+            count+=1
+        else:
+            print("avg fps:",2000/(time.time()-start_all))
+            break
         start = time.time()
         if video_path == "daheng":
-            img = cap.read_image()
+            img = camera_t.get_image()
             if img is not None:
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             else:
@@ -105,8 +116,8 @@ def test_video(video_path):
         # end=time.time()
         # img=unpack_results(result,img,mask,WITH_GMM=True)
 
-        cv2.rectangle(img, (642, 819), (711, 860),
-                      (0, 255, 0), 2)  # calibrate point
+        # cv2.rectangle(img, (642, 819), (711, 860),
+        #               (0, 255, 0), 2)  # calibrate point
 
         # img=watcher_alert_areas(img)
 

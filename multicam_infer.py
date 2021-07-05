@@ -90,7 +90,7 @@ def test_video(video_path):
         # print(type(img_right),type(img_tuple))
         print(img_wide.shape,img_left.shape,img_mid.shape)
         # results = detect_model.batch_predict((img_wide,img_wide,img_wide,img_wide), eval_transforms)
-        # fgmask = mask.get_mask(img_wide)  # GMM get fmask for moving objects
+        fgmask = mask.get_mask(img_wide)  # GMM get fmask for moving objects
         # # end=time.time()
         # img_wide = unpack_results(
         #     results[0], img_wide, GMMmask=mask, WITH_GMM=True)
