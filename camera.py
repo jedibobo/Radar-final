@@ -51,7 +51,7 @@ class GxCamera():
         # get raw image
         raw_image = None
         while raw_image is None:
-            raw_image = self.cam.data_stream[0].get_image()
+            raw_image = self.cam.data_stream[0].get_image(100)
 
         # if raw_image is None:
         #     print("Getting image failed.")
