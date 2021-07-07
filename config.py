@@ -20,12 +20,15 @@ height=1200
 place1=(102,325,734,867)
 place2=(1044,1267,752,827)
 
-cams_dict = {'cam_wide':  {"cam_sn": "NE0200060045", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3},
-             'cam_left':  {"cam_sn": "FG0210060411", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3},
-             'cam_mid':   {"cam_sn": "FG0210060412", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3},
-             'cam_right': {"cam_sn": "FG0210060413", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3}
+cams_dict = {'cam_wide':  {"cam_sn": "NE0200060045", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3, "frame_rate":10},
+             'cam_left':  {"cam_sn": "FG0210060411", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3, "frame_rate":9},
+             'cam_mid':   {"cam_sn": "FG0210060412", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3, "frame_rate":10},
+             'cam_right': {"cam_sn": "FG0210060413", "expose": 35000, "gain": 8.0, "gamma_value": 1.85, "contrast_value": 0,'blue_ratio':1.3, "frame_rate":10}
              }
 #camera sizes 
 size_wide = (1920, 1200)
 size_other=(1280,960)
 size=(1920,1080)
+
+# img_name_tuple=["img_wide","img_left","img_mid","img_right"]
+# infer_list=["img_wide","img_mid"]

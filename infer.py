@@ -47,8 +47,7 @@ def test_images(path):
     pass
 
 
-info_dict = {"cam_sn": "NE0200060045", "expose": 35000, "gain": 8.0,
-             "gamma_value": 1.85, "contrast_value": 0, 'blue_ratio': 1.3}
+info_dict = config.cams_dict['cam_wide']
 
 device_manager = gx.DeviceManager()
 
@@ -111,7 +110,7 @@ def test_video(video_path):
         # img=watcher_alert_areas(img)
 
         img = cv2.resize(img, (1920//2, 1080//2))
-        # cv2.imshow("result",img)
+        cv2.imshow("result",img)
 
         if size is None:
             size = (img.shape[1], img.shape[0])

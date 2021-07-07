@@ -62,11 +62,17 @@ def test_video(video_path):
     # best_target=None
     cv2.namedWindow("result", cv2.WINDOW_NORMAL)  # 创建一个名为video的窗口
     cv2.setWindowProperty("result", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
+    count=0
     while True:
+        if count<1000:
+            count+=1
+        else:
+            break
         start = time.time()
         if video_path == "daheng":
             img_tuple = caps.read_all()
-            if img_tuple[0] is not None and img_tuple[1] is not None and img_tuple[2] is not None and img_tuple[3] is not None:
+            if (img_tuple[0] is not None) and (img_tuple[1] is not None) and (img_tuple[2] is not None) and (img_tuple[3] is not None):
                 img_tuple = (cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
                              for img in img_tuple)
             else:
@@ -87,11 +93,24 @@ def test_video(video_path):
             if img is None:
                 break
         img_wide, img_left, img_mid, img_right=img_tuple
+        # print(img_wide[1])
+        # print()
+        # img_dict=dict(zip(config.img_name_tuple,(img_wide, img_left, img_mid, img_right)))
+        # print(img_dict)
         # print(type(img_right),type(img_tuple))
-        print(img_wide.shape,img_left.shape,img_mid.shape)
-        # results = detect_model.batch_predict((img_wide,img_wide,img_wide,img_wide), eval_transforms)
+        # print(img_wide.shape,img_left.shape,img_mid.shape)
+        # img_list=[]
+        # for x in config.infer_list:
+        #     img_list.append(img_dict[x])
+
+        # print(len(img_list))
+
+        result = detect_model.predict(img_wide, eval_transforms)
         fgmask = mask.get_mask(img_wide)  # GMM get fmask for moving objects
-        # # end=time.time()
+        img_wide = unpack_results(result, img_wide, GMMmask=mask, WITH_GMM=True)
+
+        # results = detect_model.batch_predict((img_wide, img_left), eval_transforms)
+        # fgmask = mask.get_mask(img_wide)  # GMM get fmask for moving objects
         # img_wide = unpack_results(
         #     results[0], img_wide, GMMmask=mask, WITH_GMM=True)
         # img_left = unpack_results(

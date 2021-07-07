@@ -14,8 +14,8 @@ class GxCamera():
         self.cam.Gain.set(info_dict['gain'])
 
         # fps,may not be effective
-        self.cam.AcquisitionFrameRateMode.set(gx.GxSwitchEntry.ON)
-        self.cam.AcquisitionFrameRate.set(info_dict['frame_rate'])
+        # self.cam.AcquisitionFrameRateMode.set(1)
+        # self.cam.AcquisitionFrameRate.set(60.0)
         # white balance
         self.cam.BalanceRatioSelector.set(gx.GxBalanceRatioSelectorEntry.RED)  # .set(2.0)
         self.cam.BalanceRatio.set(2.0)
@@ -51,7 +51,7 @@ class GxCamera():
         # get raw image
         raw_image = None
         while raw_image is None:
-            raw_image = self.cam.data_stream[0].get_image(100)
+            raw_image = self.cam.data_stream[0].get_image()
 
         # if raw_image is None:
         #     print("Getting image failed.")
@@ -59,8 +59,8 @@ class GxCamera():
 
         # get RGB image from raw image
         rgb_image = raw_image.convert("RGB")
-        # numpy_image = rgb_image.get_numpy_array()
-        # numpy_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
+        numpy_image = rgb_image.get_numpy_array()
+        numpy_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
         # if rgb_image is None:
         #     return None
 

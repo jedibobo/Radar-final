@@ -5,36 +5,58 @@ import cv2
 import sys
 import time
 import os
-
+import multiprocessing as mp
+import queue
+import threading
 
 from camera import GxCamera
 
+class camera_thread(threading.Thread):
+    def __init__(self,info_dict,device_manager):
+        threading.Thread.__init__(self)
+        self.cam=GxCamera(info_dict=info_dict, device_manager=device_manager)
+        self.cam.cam_start()
+        self.img_queue = queue.Queue(2)
+
+    def run(self):
+        while True:
+            img=self.cam.read_image()
+            self.img_queue.put(img)
+            
+    def get_image(self):
+        return self.img_queue.get(timeout=1)
+    
+    def kill_thread(self):
+        self.cam.cam_release()
+
 class Multicam:
     def __init__(self,cams_dict,device_manager):
-        self.cam_wide = GxCamera(info_dict=cams_dict['cam_wide'], device_manager=device_manager)
-        self.cam_left =GxCamera(info_dict=cams_dict["cam_left"],device_manager=device_manager)
-        self.cam_mid =GxCamera(info_dict=cams_dict["cam_mid"],device_manager=device_manager)
-        self.cam_right =GxCamera(info_dict=cams_dict["cam_right"],device_manager=device_manager)
+        self.cam_wide = camera_thread(info_dict=cams_dict['cam_wide'], device_manager=device_manager)
+        self.cam_left =camera_thread(info_dict=cams_dict["cam_left"],device_manager=device_manager)
+        self.cam_mid =camera_thread(info_dict=cams_dict["cam_mid"],device_manager=device_manager)
+        self.cam_right =camera_thread(info_dict=cams_dict["cam_right"],device_manager=device_manager)
+        # self.pool=mp.Pool(processes=4)
 
     def cams_start(self):
-        self.cam_wide.cam_start()
-        self.cam_left.cam_start()
-        self.cam_mid.cam_start()
-        self.cam_right.cam_start()
+        self.cam_wide.start()
+        self.cam_left.start()
+        self.cam_mid.start()
+        self.cam_right.start()
 
     def cams_release(self):
-        self.cam_wide.cam_release()
-        self.cam_left.cam_release()
-        self.cam_mid.cam_release()
-        self.cam_right.cam_release()
+        self.cam_wide.kill_thread()
+        self.cam_left.kill_thread()
+        self.cam_mid.kill_thread()
+        self.cam_right.kill_thread()
 
     def read_all(self):
-        img_wide=self.cam_wide.read_image()
-        img_left=self.cam_left.read_image()
-        img_mid=self.cam_mid.read_image()
-        img_right=self.cam_right.read_image()
+        # imgs = self.pool.map(thread_cam_read,[self.cam_wide,self.cam_left,self.cam_mid,self.cam_right] )
+        img_wide=self.cam_wide.get_image()
+        img_left=self.cam_left.get_image()
+        img_mid=self.cam_mid.get_image()
+        img_right=self.cam_right.get_image()
         return tuple([img_wide,img_left,img_mid,img_right])
-
+        # return tuple(imgs)
 
 def concat_imgs(img_wide,img_left,img_mid,img_right,src_size,dst_size):
     img_wide=cv2.resize(img_wide,src_size,interpolation=cv2.INTER_CUBIC)
@@ -45,28 +67,6 @@ def concat_imgs(img_wide,img_left,img_mid,img_right,src_size,dst_size):
     # cv2.setWindowProperty('video', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     img_concat=cv2.resize(img_concat,dst_size,interpolation=cv2.INTER_CUBIC)
     return img_concat
-
-class Multivcam:#read test videos
-    def __init__(self,cams_dict,device_manager):
-        self.cam_wide = GxCamera(info_dict=cams_dict['cam_wide'], device_manager=device_manager)
-        self.cam_left =GxCamera(info_dict=cams_dict["cam_left"],device_manager=device_manager)
-        self.cam_mid =GxCamera(info_dict=cams_dict["cam_mid"],device_manager=device_manager)
-        self.cam_right =GxCamera(info_dict=cams_dict["cam_right"],device_manager=device_manager)
-
-    def cams_start(self):
-        self.cam_wide.cam_start()
-        self.cam_left.cam_start()
-        self.cam_mid.cam_start()
-        self.cam_right.cam_start()
-
-    def cams_release(self):
-        self.cam_wide.cam_release()
-        self.cam_left.cam_release()
-        self.cam_mid.cam_release()
-        self.cam_right.cam_release()
-
-    def read_all(self):
-        return (self.cam_wide.read_image(),self.cam_left.read_image(),self.cam_mid.read_image(),self.cam_right.read_image())
 
 # import config
 # device_manager = gx.DeviceManager()

@@ -126,3 +126,13 @@ def unpack_results(result,img,GMMmask=None,WITH_GMM=False):
                     (xmin, ymin-10), font, 0.5, (255, 255, 255), thickness=1)
     
     return img
+
+def concat_imgs(img_wide,img_left,img_mid,img_right,src_size,dst_size):
+    img_wide=cv2.resize(img_wide,src_size,interpolation=cv2.INTER_CUBIC)
+    img_list=[[img_wide,img_left],[img_mid,img_right]]
+    img_concat=cv2.vconcat([cv2.hconcat(img) for img in img_list])
+    # print(img_concat.shape)
+    # cv2.namedWindow('video', cv2.WINDOW_NORMAL)  # 创建一个名为video的窗口
+    # cv2.setWindowProperty('video', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    img_concat=cv2.resize(img_concat,dst_size,interpolation=cv2.INTER_CUBIC)
+    return img_concat

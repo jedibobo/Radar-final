@@ -1,7 +1,11 @@
-/multi_cam_test
 /yolov3-inference-416
 /profiling
 /gxipy
 *.pyc
 *.avi
 *.mp4
+*.out
+*.txt
+
+ppyolo.py
+det_transforms.py
